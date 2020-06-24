@@ -4,13 +4,14 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtPayload } from './jwt-payload';
 import { UserRepository } from './user.repository';
 import { User } from './user.entity';
+import * as config from 'config';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private userRepo: UserRepository) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: 'myS3cretK3y123',
+      secretOrKey: process.env.JWT_SECRET || config.get('jwt.secretKey'),
     });
   }
 
