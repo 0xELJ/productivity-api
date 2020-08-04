@@ -1,18 +1,33 @@
-import { BaseEntity, BeforeInsert, Column, Entity, OneToMany, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { BaseEntity, BeforeInsert, Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Task } from '../tasks/task.entity';
 
-@Entity()
+@Entity({  })
 @Unique(['username'])
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
+  firstName: string;
+
+  @Column()
+  lastName: string;
+
+  @Column()
   username: string;
 
   @Column()
   password: string;
+
+  @Column()
+  email: string;
+
+  @CreateDateColumn()
+  createdAt: string;
+
+  @UpdateDateColumn()
+  updatedAt: string;
 
   @OneToMany(type => Task, task => task.user, { eager: true })
   tasks: Task[];

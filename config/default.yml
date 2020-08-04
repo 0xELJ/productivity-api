@@ -4,8 +4,8 @@ server:
 db:
   type: 'postgres'
   port: 5432
-  database: 'task_management'
+  database: 'productivity_app'
 
 jwt:
   expirationInSeconds: 3600
-  secretKey: 'myS3cretK3y123'
+  secretKey: 'myPR0duct1v1tyApp#@#23423467783213.995983'

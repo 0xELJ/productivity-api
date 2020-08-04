@@ -1,4 +1,4 @@
-import { BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { TaskStatus } from './task-status.enum';
 import { User } from '../auth/user.entity';
 
@@ -14,7 +14,19 @@ export class Task extends BaseEntity {
   description: string;
 
   @Column()
+  duration: number;
+
+  @Column()
+  timeLeft: number;
+
+  @Column()
   status: TaskStatus;
+
+  @CreateDateColumn()
+  createdAt: string;
+
+  @UpdateDateColumn()
+  updatedAt: string;
 
   @ManyToOne(type => User, user => user.tasks, { eager: false })
   user: User;
