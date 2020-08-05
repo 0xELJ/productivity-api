@@ -11,8 +11,7 @@ import { UpdateTaskDto } from './dto/update-task.dto';
 export class TasksService {
     constructor(
         @InjectRepository(TaskRepository) private taskRepo: TaskRepository,
-    ) {
-    }
+    ) {}
 
     async getTasks(getTasksDto: GetTasksDto, user: User): Promise<Task[]> {
         return this.taskRepo.getTasks(getTasksDto, user);
