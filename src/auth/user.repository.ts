@@ -41,7 +41,7 @@ export class UserRepository extends Repository<User> {
     }
   }
 
-  private async validatePassword(candidatePassword: string, password): Promise<boolean> {
+  private async validatePassword(candidatePassword: string, password: string): Promise<boolean> {
     return await bcrypt.compare(candidatePassword, password);
   }
 }
