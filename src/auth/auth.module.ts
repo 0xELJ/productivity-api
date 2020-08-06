@@ -11,16 +11,17 @@ import * as config from 'config';
 const jwtConfig = config.get('jwt');
 
 @Module({
-  imports: [
-    PassportModule.register({ defaultStrategy: 'jwt' }),
-    JwtModule.register({
-      secret: process.env.JWT_SECRET || jwtConfig.secretKey,
-      signOptions: { expiresIn: jwtConfig.expirationInSeconds },
-    }),
-    TypeOrmModule.forFeature([UserRepository]),
-  ],
-  providers: [AuthService, JwtStrategy],
-  controllers: [AuthController],
-  exports: [JwtStrategy, PassportModule],
+    imports: [
+        PassportModule.register({ defaultStrategy: 'jwt' }),
+        JwtModule.register({
+            secret: process.env.JWT_SECRET || jwtConfig.secretKey,
+            signOptions: { expiresIn: jwtConfig.expirationInSeconds },
+        }),
+        TypeOrmModule.forFeature([UserRepository]),
+    ],
+    providers: [AuthService, JwtStrategy],
+    controllers: [AuthController],
+    exports: [JwtStrategy, PassportModule],
 })
-export class AuthModule {}
+export class AuthModule {
+}

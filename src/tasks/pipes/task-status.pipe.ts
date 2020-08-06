@@ -3,24 +3,24 @@ import { TaskStatus } from '../task-status.enum';
 
 @Injectable()
 export class TaskStatusPipe implements PipeTransform {
-  readonly allowedStatuses = [
-    TaskStatus.OPEN,
-    TaskStatus.IN_PROGRESS,
-    TaskStatus.DONE,
-  ];
+    readonly allowedStatuses = [
+        TaskStatus.OPEN,
+        TaskStatus.IN_PROGRESS,
+        TaskStatus.DONE,
+    ];
 
-  transform(value: any) {
-    value = value.toUpperCase();
-    const isStatusValid = this.validateStatus(value);
+    transform(value: string) {
+        value = value.toUpperCase();
+        const isStatusValid = this.validateStatus(value);
 
-    if (!isStatusValid) {
-      throw new BadRequestException(`Status "${value} is invalid"`);
+        if (!isStatusValid) {
+            throw new BadRequestException(`Status "${value} is invalid"`);
+        }
+
+        return value;
     }
 
-    return value;
-  }
-
-  private validateStatus(status: any) {
-    return this.allowedStatuses.includes(status);
-  }
+    private validateStatus(status: any) {
+        return this.allowedStatuses.includes(status);
+    }
 }
