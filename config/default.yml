@@ -7,5 +7,5 @@ db:
   database: 'productivity_app'
 
 jwt:
-  expirationInSeconds: 3600
+  expirationInSeconds: 108000
   secretKey: 'myPR0duct1v1tyApp#@#23423467783213.995983'

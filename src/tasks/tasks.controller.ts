@@ -1,77 +1,93 @@
 import {
-  Body,
-  Controller,
-  Delete,
-  Get, Logger,
-  Param,
-  ParseIntPipe,
-  Patch,
-  Post,
-  Query,
-  UseGuards,
-  UsePipes,
-  ValidationPipe,
+    Body,
+    ClassSerializerInterceptor,
+    Controller,
+    Delete,
+    Get,
+    Logger,
+    Param,
+    ParseIntPipe,
+    Patch,
+    Post,
+    Query,
+    UseGuards,
+    UseInterceptors,
+    UsePipes,
+    ValidationPipe,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
-import { TaskStatus } from './task-status.enum';
 import { CreateTaskDto } from './dto/create-task.dto';
-import { TaskStatusPipe } from './pipes/task-status.pipe';
-import { Task } from './task.entity';
 import { GetTasksDto } from './dto/get-tasks.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from '../auth/get-user.decorator';
 import { User } from '../auth/user.entity';
+import { UpdateTaskDto } from './dto/update-task.dto';
+import { TaskSerializer } from './serializers/TaskSerializer';
+import { TaskSerializerCreator } from './task-serializer-creator';
 
 @Controller('tasks')
 @UseGuards(AuthGuard())
 export class TasksController {
-  private logger = new Logger('TaskController');
+    private logger = new Logger('TaskController');
 
-  constructor(private tasksService: TasksService) {}
+    constructor(private tasksService: TasksService) {}
 
-  @Get()
-  getTasks(
-    @Query(ValidationPipe) getTasksDto: GetTasksDto,
-    @GetUser() user: User,
-  ): Promise<Task[]> {
-    this.logger.verbose(`User "${user.username}" retrieving all tasks with filters: ${JSON.stringify(getTasksDto)}`);
-    return this.tasksService.getTasks(getTasksDto, user);
-  }
+    @UseInterceptors(ClassSerializerInterceptor)
+    @Get()
+    async getTasks(
+        @Query(ValidationPipe) getTasksDto: GetTasksDto,
+        @GetUser() user: User,
+    ): Promise<TaskSerializer> {
+        this.logger.verbose(`User "${user.username}" retrieving all tasks with filters: ${JSON.stringify(getTasksDto)}`);
+        const tasks = await this.tasksService.getTasks(getTasksDto, user);
+        const [serializedTask] = new TaskSerializerCreator(tasks).tasks;
+        return serializedTask;
+    }
 
-  @Get(':id')
-  getTaskById(
-    @Param('id', ParseIntPipe) id: number,
-    @GetUser() user: User,
-  ): Promise<Task> {
-    return this.tasksService.getTaskById(id, user);
-  }
+    @UseInterceptors(ClassSerializerInterceptor)
+    @Get(':id')
+    async getTaskById(
+        @Param('id', ParseIntPipe) id: number,
+        @GetUser() user: User,
+    ): Promise<TaskSerializer> {
+        const task = await this.tasksService.getTaskById(id, user.id);
+        const [serializedTask] = new TaskSerializerCreator([task]).tasks;
+        return serializedTask;
+    }
 
-  @Post()
-  @UsePipes(ValidationPipe)
-  createTask(
-    @Body() createTaskDto: CreateTaskDto,
-    @GetUser() user: User,
-  ): Promise<Task> {
-    this.logger.verbose(`User "${user.username}" creating a new task with data ${JSON.stringify(createTaskDto)}`);
-    return this.tasksService.createTask(createTaskDto, user);
-  }
+    @Post()
+    @UsePipes(new ValidationPipe({ transform: true }))
+    @UseInterceptors(ClassSerializerInterceptor)
+    async createTask(
+        @Body() createTaskDto: CreateTaskDto,
+        @GetUser() user: User,
+    ): Promise<TaskSerializer> {
+        this.logger.verbose(`User "${user.username}" creating a new task with data ${JSON.stringify(createTaskDto)}`);
+        const task = await this.tasksService.createTask(createTaskDto, user);
+        const [serializedTask] = new TaskSerializerCreator([task]).tasks;
+        return serializedTask;
+    }
 
-  @Delete(':id')
-  deleteTask(
-    @Param('id', ParseIntPipe) id: number,
-    @GetUser() user: User,
-  ): Promise<number> {
-    this.logger.verbose(`User "${user.username}" deleting task with ID ${id}`);
-    return this.tasksService.deleteTask(id, user);
-  }
+    @Delete(':id')
+    deleteTask(
+        @Param('id', ParseIntPipe) id: number,
+        @GetUser() user: User,
+    ): Promise<number> {
+        this.logger.verbose(`User "${user.username}" deleting task with ID ${id}`);
+        return this.tasksService.deleteTask(id, user);
+    }
 
-  @Patch(':id/status')
-  updateTask(
-    @Param('id', ParseIntPipe) id: number,
-    @Body('status', TaskStatusPipe) status: TaskStatus,
-    @GetUser() user: User,
-  ): Promise<Task> {
-    this.logger.verbose(`User "${user.username}" updating task with ID ${id}`);
-    return this.tasksService.updateTaskStatus(id, status, user);
-  }
+    @Patch(':id')
+    @UsePipes(new ValidationPipe({ transform: true }))
+    @UseInterceptors(ClassSerializerInterceptor)
+    async updateTask(
+        @Param('id', ParseIntPipe) id: number,
+        @Body() updateTaskDto: UpdateTaskDto,
+        @GetUser() user: User,
+    ): Promise<TaskSerializer> {
+        this.logger.verbose(`User "${user.username}" updating task with ID ${id}`);
+        const task = await this.tasksService.updateTask(id, updateTaskDto, user.id);
+        const [serializedTask] = new TaskSerializerCreator([task]).tasks;
+        return serializedTask;
+    }
 }
