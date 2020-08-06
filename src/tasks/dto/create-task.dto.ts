@@ -1,5 +1,6 @@
-import { IsNotEmpty, IsNumber, Max, MaxLength, Min } from 'class-validator';
+import { IsNotEmpty, IsNotEmptyObject, MaxLength } from 'class-validator';
 import { Type } from 'class-transformer';
+import { TaskTimeDto } from './task-time.dto';
 
 export class CreateTaskDto {
     @IsNotEmpty()
@@ -10,10 +11,7 @@ export class CreateTaskDto {
     @MaxLength(300)
     description: string;
 
-    @IsNotEmpty()
-    @Type(() => Number)
-    @IsNumber()
-    @Min(60)
-    @Max(7200)
-    duration: number;
+    @IsNotEmptyObject()
+    @Type(() => TaskTimeDto)
+    durationTime: TaskTimeDto;
 }

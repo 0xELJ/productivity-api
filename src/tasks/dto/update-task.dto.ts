@@ -1,6 +1,7 @@
-import { IsIn, IsNumber, IsOptional, Max, MaxLength, Min } from 'class-validator';
+import { IsIn, IsOptional, MaxLength } from 'class-validator';
 import { Type } from 'class-transformer';
 import { TaskStatus } from '../task-status.enum';
+import { TaskTimeDto } from './task-time.dto';
 
 export class UpdateTaskDto {
     @IsOptional()
@@ -16,16 +17,10 @@ export class UpdateTaskDto {
     status: TaskStatus;
 
     @IsOptional()
-    @Type(() => Number)
-    @IsNumber()
-    @Min(60)
-    @Max(7200)
-    duration: number;
+    @Type(() => TaskTimeDto)
+    durationTime: TaskTimeDto;
 
     @IsOptional()
-    @Type(() => Number)
-    @IsNumber()
-    @Min(60)
-    @Max(7200)
-    timeLeft: number;
+    @Type(() => TaskTimeDto)
+    remainingTime: TaskTimeDto;
 }

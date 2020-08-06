@@ -40,13 +40,13 @@ export class TaskRepository extends Repository<Task> {
     }
 
     async createTask(createTaskDto: CreateTaskDto, user: User): Promise<Task> {
-        const { title, description, duration } = createTaskDto;
+        const { title, description, durationTime } = createTaskDto;
         const task = new Task();
 
         task.title = title;
         task.description = description;
-        task.duration = duration;
-        task.timeLeft = duration;
+        task.duration = durationTime.timeToSeconds();
+        task.timeLeft = durationTime.timeToSeconds();
         task.status = TaskStatus.OPEN;
         task.user = user;
 
@@ -65,7 +65,7 @@ export class TaskRepository extends Repository<Task> {
     }
 
     async updateTask(task: Task, updateTaskDto: UpdateTaskDto): Promise<Task> {
-        const { title, description, status, duration, timeLeft } = updateTaskDto;
+        const { title, description, status, durationTime, remainingTime } = updateTaskDto;
 
         if (title) {
             task.title = title;
@@ -76,12 +76,12 @@ export class TaskRepository extends Repository<Task> {
         if (status) {
             task.status = status;
         }
-        if (duration) {
-            task.duration = duration;
-            task.timeLeft = duration;
+        if (durationTime) {
+            task.duration = durationTime.timeToSeconds();
+            task.timeLeft = durationTime.timeToSeconds();
         }
-        if (timeLeft) {
-            task.timeLeft = timeLeft;
+        if (remainingTime) {
+            task.timeLeft = remainingTime.timeToSeconds();
         }
 
         await task.save();
