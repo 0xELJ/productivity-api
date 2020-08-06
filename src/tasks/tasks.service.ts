@@ -43,8 +43,6 @@ export class TasksService {
 
     async updateTask(id: number, updateTaskDto: UpdateTaskDto, userId: number): Promise<Task> {
         const task = await this.getTaskById(id, userId);
-        const updatedTask = await this.taskRepo.updateTask(task, updateTaskDto);
-
-        return updatedTask;
+        return await this.taskRepo.updateTask(task, updateTaskDto);
     }
 }

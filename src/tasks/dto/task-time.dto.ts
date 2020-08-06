@@ -13,14 +13,14 @@ export class TaskTimeDto {
     @Type(() => Number)
     @IsNumber()
     @Min(0)
-    @Max(60)
+    @Max(59)
     minutes: number;
 
     @IsNotEmpty()
     @Type(() => Number)
     @IsNumber()
     @Min(0)
-    @Max(60)
+    @Max(59)
     seconds: number;
 
     constructor(totalSeconds: number) {
@@ -30,15 +30,14 @@ export class TaskTimeDto {
         this.seconds = seconds;
     }
 
-    // TODO: Fix method to display correct formatting
     secondsToTime(totalSeconds: number): { hours: number, minutes: number, seconds: number } {
         let hours: number;
         let minutes: number;
         let seconds: number;
 
-        hours = Math.round(totalSeconds / 3600);
+        hours = Math.floor(totalSeconds / 3600);
         totalSeconds = totalSeconds % 3600;
-        minutes = Math.round(totalSeconds / 60);
+        minutes = Math.floor(totalSeconds / 60);
         seconds = totalSeconds % 60;
 
         return { hours, minutes, seconds };

@@ -10,36 +10,38 @@ import {
     Patch,
     Post,
     Query,
-    UseGuards, UseInterceptors,
+    UseGuards,
+    UseInterceptors,
     UsePipes,
     ValidationPipe,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
-import { Task } from './task.entity';
 import { GetTasksDto } from './dto/get-tasks.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from '../auth/get-user.decorator';
 import { User } from '../auth/user.entity';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { TaskSerializer } from './serializers/TaskSerializer';
-import { TaskSerializerCreator } from './TaskSerializerCreator';
+import { TaskSerializerCreator } from './task-serializer-creator';
 
 @Controller('tasks')
 @UseGuards(AuthGuard())
 export class TasksController {
     private logger = new Logger('TaskController');
 
-    constructor(private tasksService: TasksService) {
-    }
+    constructor(private tasksService: TasksService) {}
 
+    @UseInterceptors(ClassSerializerInterceptor)
     @Get()
-    getTasks(
+    async getTasks(
         @Query(ValidationPipe) getTasksDto: GetTasksDto,
         @GetUser() user: User,
-    ): Promise<Task[]> {
+    ): Promise<TaskSerializer> {
         this.logger.verbose(`User "${user.username}" retrieving all tasks with filters: ${JSON.stringify(getTasksDto)}`);
-        return this.tasksService.getTasks(getTasksDto, user);
+        const tasks = await this.tasksService.getTasks(getTasksDto, user);
+        const [serializedTask] = new TaskSerializerCreator(tasks).tasks;
+        return serializedTask;
     }
 
     @UseInterceptors(ClassSerializerInterceptor)
@@ -75,7 +77,7 @@ export class TasksController {
         return this.tasksService.deleteTask(id, user);
     }
 
-    @Patch(':id/status')
+    @Patch(':id')
     @UsePipes(new ValidationPipe({ transform: true }))
     @UseInterceptors(ClassSerializerInterceptor)
     async updateTask(
