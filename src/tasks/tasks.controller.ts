@@ -37,11 +37,10 @@ export class TasksController {
     async getTasks(
         @Query(ValidationPipe) getTasksDto: GetTasksDto,
         @GetUser() user: User,
-    ): Promise<TaskSerializer> {
+    ): Promise<TaskSerializer[]> {
         this.logger.verbose(`User "${user.username}" retrieving all tasks with filters: ${JSON.stringify(getTasksDto)}`);
         const tasks = await this.tasksService.getTasks(getTasksDto, user);
-        const [serializedTask] = new TaskSerializerCreator(tasks).tasks;
-        return serializedTask;
+        return new TaskSerializerCreator(tasks).tasks;
     }
 
     @UseInterceptors(ClassSerializerInterceptor)
